@@ -1,30 +1,47 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-# Configuração do Chrome em modo headless
+# Login e senha fixos (ajuste aqui seu usuário e senha)
+LOGIN = "silas.ferreira@quark.tec.br"
+SENHA = "ohchio8ve#F5"
+
+# Configuração para rodar headless no Actions
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+chrome_options.add_argument("--headless=new")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-# Inicia o driver
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+driver = webdriver.Chrome(options=chrome_options)
 
-# Acessa o site
-driver.get("https://rh-colaborador.quark.tec.br/")
+try:
+    driver.get("https://rh-colaborador.quark.tec.br/")
+    wait = WebDriverWait(driver, 20)
 
-# Login e senha fixos (por enquanto)
-login = "silas.ferreira@quark.tec.br"
-senha = "ohchio8ve#F5"
+    # Preencher login
+    wait.until(EC.element_to_be_clickable((By.ID, "login"))).send_keys(LOGIN)
+    driver.find_element(By.ID, "senha").send_keys(SENHA)
+    driver.find_element(By.ID, "politica-privacidade").click()
+    driver.find_element(By.ID, "logar").click()
 
-driver.find_element("id", "login").send_keys(login)
-driver.find_element("id", "senha").send_keys(senha)
-driver.find_element("id", "politica-privacidade").click()
+    # Clicar em "Registrar Ponto"
+    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".btn-gradient"))).click()
 
-driver.find_element("id", "login-button").click()
+    # Clicar no botão final
+    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".container__direito-maquina"))).click()
 
-time.sleep(3)
-driver.quit()
+    # Esperar mensagem de sucesso
+    wait.until(EC.text_to_be_present_in_element(
+        (By.TAG_NAME, "body"),
+        "Ponto registrado com sucesso!"
+    ))
+
+    print("✅ Ponto registrado com sucesso!")
+
+    time.sleep(3)
+
+finally:
+    driver.quit()
