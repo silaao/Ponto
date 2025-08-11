@@ -1,9 +1,9 @@
 name: Rodar batida de ponto
 
 on:
-  workflow_dispatch:  # permite rodar manualmente no GitHub
+  workflow_dispatch:  # permite rodar manualmente
   schedule:
-    - cron: "0 11 * * 1-5"  # roda às 07:00 Manaus (UTC-4)
+    - cron: "0 11 * * 1-5"  # 07:00 Manaus (UTC-4)
     - cron: "0 15 * * 1-5"  # 11:00 Manaus
     - cron: "0 17 * * 1-5"  # 13:00 Manaus
     - cron: "0 21 * * 1-5"  # 17:00 Manaus
@@ -11,6 +11,9 @@ on:
 jobs:
   run-python:
     runs-on: ubuntu-latest
+    env: # <-- Definindo variáveis aqui para todos os steps
+      QUARK_LOGIN: ${{ secrets.QUARK_LOGIN }}
+      QUARK_SENHA: ${{ secrets.QUARK_SENHA }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -20,11 +23,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y chromium-browser chromium-chromedriver python3-selenium
 
-      - name: Rodar script python
-        run: python3 batida_ponto.py
+      - name: Verificar variáveis (debug)
+        run: |
+          if [ -z "$QUARK_LOGIN" ]; then
+            echo "❌ QUARK_LOGIN não está definida"
+            exit 1
+          else
+            echo "✅ QUARK_LOGIN está definida"
+          fi
 
       - name: Rodar script python
-        env:
-          QUARK_LOGIN: ${{ secrets.QUARK_LOGIN }}
-          QUARK_SENHA: ${{ secrets.QUARK_SENHA }}
         run: python3 batida_ponto.py
