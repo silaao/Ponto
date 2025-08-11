@@ -22,3 +22,9 @@ jobs:
 
       - name: Rodar script python
         run: python3 batida_ponto.py
+
+      - name: Rodar script python
+        env:
+          QUARK_LOGIN: ${{ secrets.QUARK_LOGIN }}
+          QUARK_SENHA: ${{ secrets.QUARK_SENHA }}
+        run: python3 batida_ponto.py
