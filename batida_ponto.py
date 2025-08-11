@@ -8,8 +8,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # Pega login e senha das variáveis de ambiente
-LOGIN = os.getenv("silas.ferreira@quark.tec.br")
-SENHA = os.getenv("ohchio8ve#F5")
+
+LOGIN = os.getenv("QUARK_LOGIN")
+SENHA = os.getenv("QUARK_SENHA")
 
 if not LOGIN or not SENHA:
     raise Exception("As variáveis QUARK_LOGIN e QUARK_SENHA não estão definidas.")
