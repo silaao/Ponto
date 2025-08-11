@@ -1,1 +1,39 @@
+name: Bater ponto automático
+
+on:
+  schedule:
+    - cron: '0 11 * * 1-5'  # 07:00 Manaus
+    - cron: '0 15 * * 1-5'  # 11:00 Manaus
+    - cron: '0 17 * * 1-5'  # 13:00 Manaus
+    - cron: '0 21 * * 1-5'  # 17:00 Manaus
+  workflow_dispatch:       # permite rodar manualmente
+
+jobs:
+  bater-ponto:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install system deps (Chromium)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium webdriver-manager
+
+      - name: Run batida de ponto
+        env:
+          QUARK_LOGIN: ${{ secrets.QUARK_LOGIN }}
+          QUARK_SENHA: ${{ secrets.QUARK_SENHA }}
+        run: python3 batida_ponto.py
 
